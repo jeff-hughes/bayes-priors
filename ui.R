@@ -3,30 +3,25 @@
 # You can find out more about building applications with Shiny here:
 #
 # http://shiny.rstudio.com
-#
 
 library(shiny)
 
-data(chickwts)
-
 shinyUI(fluidPage(
 
-  # Application title
-  titlePanel("Bayesian Priors"),
-
-  # Sidebar with a slider input for number of bins
-  sidebarLayout(
-    sidebarPanel(
-      sliderInput("bins",
-                  "Number of bins:",
-                  min = 1,
-                  max = 50,
-                  value = 30)
-    ),
-
-    # Show a plot of the generated distribution
-    mainPanel(
-      plotOutput("distPlot")
+    # Application title
+    titlePanel('Bayesian Priors'),
+    
+    sidebarLayout(
+        
+        # Sidebar
+        sidebarPanel(
+        ),
+        
+        # Main panel
+        mainPanel(
+            verbatimTextOutput('traditional_t'),
+            verbatimTextOutput('bayes_t'),
+            plotOutput('posterior_plot')
+        )
     )
-  )
 ))
