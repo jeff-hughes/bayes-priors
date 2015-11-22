@@ -15,6 +15,12 @@ shinyUI(fluidPage(
         
         # Sidebar
         sidebarPanel(
+            selectInput('tType', label=HTML('Type of <i>t</i>-test'), choices=list(
+                'One sample' = 'onesamp',
+                'Independent samples' = 'indep',
+                'Related samples' = 'related'
+            ), selected='indep'),
+            
             textInput('t', label=HTML('<i>t</i>-value:'), value='2.5'),
             
             textInput('df', label='Degrees of freedom:', value='23'),
@@ -32,9 +38,12 @@ shinyUI(fluidPage(
             textInput('priorText',
                 label=HTML('<em>OR</em>, input a specific prior width scale:')),
             
-            textInput('power',
-                label=HTML('If determining prior from <i>N</i>, input power here:'),
-                value='.8')
+            conditionalPanel(
+                condition = 'input.prior == "N"',
+                textInput('power',
+                    label=HTML('If determining prior from <i>N</i>, input power here:'),
+                    value='.8')
+            )
         ),
         
         # Main panel
