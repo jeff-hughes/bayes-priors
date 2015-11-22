@@ -50,7 +50,11 @@ shinyUI(fluidPage(
             helpText('The prior is set to a Cauchy distribution with a scaling',
                 'width equal to the expected effect size. You can either select',
                 'a preset effect size, input your own, or infer the expected',
-                'effect size based on the power of the test.')
+                'effect size based on the power of the test.'),
+            
+            p('For a more complete explanation of how to use this app, see',
+                a('Will Gervais\' blog post.',
+                    href='http://willgervais.com/blog/2015/11/20/playing-with-bayes-factors'))
         ),
         
         # Main panel
@@ -78,6 +82,10 @@ shinyUI(fluidPage(
                 rel='license',
                 href='http://creativecommons.org/licenses/by/4.0/'
                 )
+        ),
+        p('This app is based in part on code by',
+            a('Will Gervais.',
+                href='http://willgervais.com/blog/2015/11/20/playing-with-bayes-factors')
         ),
         align='center'
     )
