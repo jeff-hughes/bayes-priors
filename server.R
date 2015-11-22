@@ -8,19 +8,55 @@ library(shiny)
 library(BayesFactor)
 library(pwr)
 
+`%then%` <- shiny:::`%OR%`
+
 shinyServer(function(input, output) {
+    
+    t <- reactive({
+        validate(
+            need(input$t != '', 'Please enter a t-value.') %then%
+            need(!is.na(as.numeric(input$t)), 't-value must be numeric.')
+        )
+        as.numeric(input$t)
+    })
+    
+    df <- reactive({
+        validate(
+            need(input$df != '', 'Please enter the degrees of freedom for the t-test.') %then%
+            need(!is.na(as.numeric(input$df)), 'Degrees of freedom must be numeric.')
+        )
+        as.numeric(input$df)
+    })
     
     # calculate sample size from degrees of freedom
     n <- reactive({
         if (input$tType == 'indep') {
-            (as.numeric(input$df) + 2) / 2  # get the per-condition sample size
+            (df() + 2) / 2  # get the per-condition sample size
         } else {
-            as.numeric(input$df) + 1
+            df() + 1
         }
     })
     
     # determine proper prior scaling width
     r <- reactive({
+        if (input$priorText != '') {
+            validate(
+                need(!is.na(as.numeric(input$priorText)),
+                    'Prior width must be numeric.') %then%
+                need(as.numeric(input$priorText) > 0,
+                    'Prior width must be positive and non-zero.')
+            )
+        }
+        if (input$prior == 'N') {
+            validate(
+                need(!is.na(as.numeric(input$power)),
+                    'Power must be numeric.') %then%
+                need(as.numeric(input$power) > .25,
+                    'Power must be positive and non-zero.')
+            )
+        }
+        
+        
         if (input$priorText != '') {
             as.numeric(input$priorText)
         } else {
@@ -48,11 +84,11 @@ shinyServer(function(input, output) {
         }
     })
     
+    # calculate Bayes factor
     bayes_calc <- reactive({
-        t <- as.numeric(input$t)
-        
+        # set to half-Cauchy if one-tailed test
         if (input$onetail) {
-            if (t >= 0) {
+            if (t() >= 0) {
                 altInt <- c(0, Inf)
             } else {
                 altInt <- c(-Inf, 0)
@@ -62,14 +98,15 @@ shinyServer(function(input, output) {
         }
         
         if (input$tType == 'indep') {
-            ttest.tstat(t, n(), n(), rscale=r(), nullInterval=altInt)
+            ttest.tstat(t(), n(), n(), rscale=r(), nullInterval=altInt)
         } else {
-            ttest.tstat(t, n(), rscale=r(), nullInterval=altInt)
+            ttest.tstat(t(), n(), rscale=r(), nullInterval=altInt)
         }
     })
     
     output$freq_t <- renderUI({
-        p <- pt(-abs(as.numeric(input$t)), df=as.numeric(input$df))
+        # calculate p-value for t-test
+        p <- pt(-abs(t()), df=df())
         if (!input$onetail) {
             p <- 2 * p
         }
@@ -80,7 +117,7 @@ shinyServer(function(input, output) {
         }
         
         HTML(paste0('Frequentist ', tags$i('t'), '-test: ', tags$i('t'), '(',
-            input$df, ') = ', input$t, ', ', tags$i('p'), ' = ', signif(p, 3),
+            df(), ') = ', t(), ', ', tags$i('p'), ' = ', signif(p, 3),
             onetail_output))
     })
     
@@ -91,12 +128,18 @@ shinyServer(function(input, output) {
     })
     
     output$prior_plot <- renderPlot({
-        t <- as.numeric(input$t)
-        x <- seq(-2, 2, by=.01)
+        d <- (t() * 2) / sqrt(df())  # calculate effect size
+        
+        # handle large effect sizes
+        if (abs(d) > 1.8) {
+            x <- seq(-(abs(d) + .5), (abs(d) + .5), by=.01)
+        } else {
+            x <- seq(-2, 2, by=.01)
+        }
         alt <- dcauchy(x, scale=r())
         
         if (input$onetail) {
-            if (t >= 0) {
+            if (t() >= 0) {
                 alt[x < 0] <- 0
             } else {
                 alt[x > 0] <- 0
@@ -108,7 +151,6 @@ shinyServer(function(input, output) {
         
         abline(v=0, col='red', lty=5)  # plot null point prior
         
-        d <- (t * 2) / sqrt(as.numeric(input$df))  # calculate effect size
         abline(v=d, col='blue', lty=3)  # draw in observed effect size
         
         legend(
