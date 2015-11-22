@@ -60,5 +60,25 @@ shinyUI(fluidPage(
             htmlOutput('bayes_t'),
             plotOutput('prior_plot')
         )
+    ),
+        
+    # Footer
+    fluidRow(
+        p(
+            a(
+                img(alt='Creative Commons License',
+                    src='https://i.creativecommons.org/l/by/4.0/80x15.png',
+                    style='vertical-align: middle'),
+                rel='license',
+                href='http://creativecommons.org/licenses/by/4.0/'
+                ),
+            'This work is licensed under a',
+            a(
+                'Creative Commons Attribution 4.0 International License.',
+                rel='license',
+                href='http://creativecommons.org/licenses/by/4.0/'
+                )
+        ),
+        align='center'
     )
 ))
