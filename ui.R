@@ -9,7 +9,7 @@ library(shiny)
 shinyUI(fluidPage(
 
     # Application title
-    titlePanel('Bayesian Priors'),
+    titlePanel('Bayes Factors for T-Tests'),
     
     sidebarLayout(
         
@@ -56,6 +56,7 @@ shinyUI(fluidPage(
         # Main panel
         mainPanel(
             htmlOutput('freq_t'),
+            br(),
             htmlOutput('bayes_t'),
             plotOutput('prior_plot')
         )
