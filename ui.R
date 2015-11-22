@@ -39,6 +39,7 @@ shinyUI(fluidPage(
         
         # Main panel
         mainPanel(
+            htmlOutput('freq_t'),
             htmlOutput('bayes_t'),
             plotOutput('prior_plot')
         )

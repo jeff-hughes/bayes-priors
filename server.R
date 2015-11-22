@@ -51,6 +51,19 @@ shinyServer(function(input, output) {
         }
     })
     
+    output$freq_t <- renderUI({
+        p <- pt(-abs(as.numeric(input$t)), df=as.numeric(input$df))
+        if (input$onetail != TRUE) {
+            p <- 2 * p
+        }
+        
+        onetail_output <- ifelse(input$onetail == TRUE, ' (one-tailed)', '')
+        
+        HTML(paste0('Frequentist ', tags$i('t'), '-test: ', tags$i('t'), '(',
+            input$df, ') = ', input$t, ', ', tags$i('p'), ' = ', signif(p, 3),
+            onetail_output))
+    })
+    
     output$bayes_t <- renderUI({
         bf <- bayes_calc()
         HTML(paste0('Bayes Factor: ', strong(signif(bf$bf, 3)), ' (&#177;', signif(bf$properror, 3), ')'))
@@ -70,15 +83,15 @@ shinyServer(function(input, output) {
         }
         plot(x, alt, type='l', xlab='Effect size', ylab='Density')  # plot Cauchy alt. prior
         
-        abline(v=0, col='red')  # plot null point prior
+        abline(v=0, col='red', lty=5)  # plot null point prior
         
         d <- (t * 2) / sqrt(as.numeric(input$df))  # calculate effect size
-        abline(v=d, col='blue')  # draw in observed effect size
+        abline(v=d, col='blue', lty=3)  # draw in observed effect size
         
         legend(
             'topright',
             c('Point null prior', 'Alternative prior', 'Observed effect'),
-            lty=c(1, 1, 1),
+            lty=c(5, 1, 3),
             col=c('red', 'black', 'blue'))
     })
     
