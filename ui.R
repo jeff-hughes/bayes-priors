@@ -24,7 +24,7 @@ shinyUI(fluidPage(
             
             textInput('t', label=HTML('<i>t</i>-value:'), value='2.5'),
             
-            textInput('df', label='Degrees of freedom:', value='23'),
+            textInput('df', label='Degrees of freedom:', value='25'),
             
             checkboxInput('onetail', label='One-tailed?'),
             
