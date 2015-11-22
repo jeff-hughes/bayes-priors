@@ -15,13 +15,32 @@ shinyUI(fluidPage(
         
         # Sidebar
         sidebarPanel(
+            textInput('t', label=HTML('<i>t</i>-value:'), value='2.5'),
+            
+            textInput('df', label='Degrees of freedom:', value='23'),
+            
+            checkboxInput('onetail', label='One-tailed?'),
+            
+            selectInput('prior', label='Select a prior:', choices=list(
+                'small (.2)' = 'small',
+                'medium (.5)' = 'medium',
+                'large (.8)' = 'large',
+                'social (.36)' = 'social',
+                'determine from N' = 'N'
+            )),
+            
+            textInput('priorText',
+                label=HTML('<em>OR</em>, input a specific prior width scale:')),
+            
+            textInput('power',
+                label=HTML('If determining prior from <i>N</i>, input power here:'),
+                value='.8')
         ),
         
         # Main panel
         mainPanel(
-            verbatimTextOutput('traditional_t'),
-            verbatimTextOutput('bayes_t'),
-            plotOutput('posterior_plot')
+            htmlOutput('bayes_t'),
+            plotOutput('prior_plot')
         )
     )
 ))
